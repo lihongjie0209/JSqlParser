@@ -20,6 +20,11 @@ public abstract class AbstractJSqlParser<P> {
     protected int jdbcParameterIndex = 0;
     protected boolean errorRecovery = false;
     protected List<ParseException> parseErrors = new ArrayList<>();
+    
+    // Cooperative timeout mechanism
+    protected long parseStartTime = 0;
+    protected long timeoutMillis = 0;
+    protected volatile boolean interrupted = false;
 
     public P withSquareBracketQuotation(boolean allowSquareBracketQuotation) {
         return withFeature(Feature.allowSquareBracketQuotation, allowSquareBracketQuotation);
