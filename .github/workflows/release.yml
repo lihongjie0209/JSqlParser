@@ -42,21 +42,29 @@ jobs:
         TAG_NAME=${{ steps.tag.outputs.TAG_NAME }}
         cd target
         
+        # Auto-detect version from POM
+        POM_VERSION=$(grep -m 1 '<version>' ../pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+        echo "Detected POM version: ${POM_VERSION}"
+        
         # Rename main JAR
-        if [ -f "jsqlparser-4.5.jar" ]; then
-          mv jsqlparser-4.5.jar jsqlparser-${TAG_NAME}.jar
+        if [ -f "jsqlparser-${POM_VERSION}.jar" ]; then
+          mv jsqlparser-${POM_VERSION}.jar jsqlparser-${TAG_NAME}.jar
+          echo "✓ Renamed main JAR"
         fi
         
         # Rename sources JAR
-        if [ -f "jsqlparser-4.5-sources.jar" ]; then
-          mv jsqlparser-4.5-sources.jar jsqlparser-${TAG_NAME}-sources.jar
+        if [ -f "jsqlparser-${POM_VERSION}-sources.jar" ]; then
+          mv jsqlparser-${POM_VERSION}-sources.jar jsqlparser-${TAG_NAME}-sources.jar
+          echo "✓ Renamed sources JAR"
         fi
         
         # Rename javadoc JAR
-        if [ -f "jsqlparser-4.5-javadoc.jar" ]; then
-          mv jsqlparser-4.5-javadoc.jar jsqlparser-${TAG_NAME}-javadoc.jar
+        if [ -f "jsqlparser-${POM_VERSION}-javadoc.jar" ]; then
+          mv jsqlparser-${POM_VERSION}-javadoc.jar jsqlparser-${TAG_NAME}-javadoc.jar
+          echo "✓ Renamed javadoc JAR"
         fi
         
+        echo "Final artifacts:"
         ls -lh *.jar
         
     - name: Create Release
