@@ -20,6 +20,11 @@ public abstract class AbstractJSqlParser<P> {
     protected int jdbcParameterIndex = 0;
     protected boolean errorRecovery = false;
     protected List<ParseException> parseErrors = new ArrayList<>();
+    
+    // Cooperative timeout mechanism
+    protected long parseStartTime = 0;
+    protected long timeoutMillis = 0;
+    protected volatile boolean interrupted = false;
 
     public P withSquareBracketQuotation(boolean allowSquareBracketQuotation) {
         return withFeature(Feature.allowSquareBracketQuotation, allowSquareBracketQuotation);
@@ -70,4 +75,28 @@ public abstract class AbstractJSqlParser<P> {
     public List<ParseException> getParseErrors() {
         return parseErrors;
     }
+
+    public void startTimeout() {
+        this.timeoutMillis = getConfiguration().getAsLong(Feature.timeOut);
+        this.parseStartTime = System.currentTimeMillis();
+        this.interrupted = false;
+    }
+
+    public boolean checkTimeout() {
+        if (timeoutMillis <= 0) {
+            return false;
+        }
+        long elapsed = System.currentTimeMillis() - parseStartTime;
+        if (elapsed > timeoutMillis) {
+            interrupted = true;
+            return true;
+        }
+        return false;
+    }
+
+    public void resetTimeout() {
+        this.parseStartTime = 0;
+        this.interrupted = false;
+    }
+
 }
