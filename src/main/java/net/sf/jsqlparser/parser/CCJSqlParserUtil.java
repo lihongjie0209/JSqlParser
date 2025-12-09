@@ -13,12 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Stack;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -298,21 +294,19 @@ public final class CCJSqlParserUtil {
     public static Statement parseStatement(CCJSqlParser parser, ExecutorService executorService)
             throws JSQLParserException {
         Statement statement = null;
-        Future<Statement> future = executorService.submit(new Callable<Statement>() {
-            @Override
-            public Statement call() throws ParseException {
-                return parser.Statement();
-            }
-        });
         try {
-            statement = future.get(parser.getConfiguration().getAsLong(Feature.timeOut),
-                    TimeUnit.MILLISECONDS);
-        } catch (TimeoutException ex) {
-            parser.interrupted = true;
-            future.cancel(true);
-            throw new JSQLParserException("Time out occurred.", ex);
+            parser.startTimeout();
+            statement = parser.Statement();
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.");
+            }
         } catch (Exception ex) {
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.", ex);
+            }
             throw new JSQLParserException(ex);
+        } finally {
+            parser.resetTimeout();
         }
         return statement;
     }
@@ -379,21 +373,19 @@ public final class CCJSqlParserUtil {
     public static Statements parseStatements(CCJSqlParser parser, ExecutorService executorService)
             throws JSQLParserException {
         Statements statements = null;
-        Future<Statements> future = executorService.submit(new Callable<Statements>() {
-            @Override
-            public Statements call() throws ParseException {
-                return parser.Statements();
-            }
-        });
         try {
-            statements = future.get(parser.getConfiguration().getAsLong(Feature.timeOut),
-                    TimeUnit.MILLISECONDS);
-        } catch (TimeoutException ex) {
-            parser.interrupted = true;
-            future.cancel(true);
-            throw new JSQLParserException("Time out occurred.", ex);
+            parser.startTimeout();
+            statements = parser.Statements();
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.");
+            }
         } catch (Exception ex) {
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.", ex);
+            }
             throw new JSQLParserException(ex);
+        } finally {
+            parser.resetTimeout();
         }
         return statements;
     }
