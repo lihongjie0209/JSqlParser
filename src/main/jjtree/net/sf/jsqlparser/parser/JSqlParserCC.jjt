@@ -607,6 +607,12 @@ Statement Statement() #Statement:
     Expression condition;
 }
 {
+    { 
+        // Check timeout at the start of parsing
+        if (checkTimeout()) {
+            throw new ParseException("Parsing timeout exceeded");
+        }
+    }
     try {
         (
             <K_IF> condition=Condition() 
@@ -774,6 +780,12 @@ Statements Statements() #Statements: {
     Expression condition;
 }
 {
+    { 
+        // Check timeout at the start of parsing
+        if (checkTimeout()) {
+            throw new ParseException("Parsing timeout exceeded");
+        }
+    }
     (<ST_SEMICOLON>)*
     try {
         (
