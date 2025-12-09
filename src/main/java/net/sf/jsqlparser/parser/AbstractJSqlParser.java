@@ -70,4 +70,42 @@ public abstract class AbstractJSqlParser<P> {
     public List<ParseException> getParseErrors() {
         return parseErrors;
     }
+
+    /**
+     * Start the timeout timer for cooperative timeout mechanism.
+     * This should be called before parsing starts.
+     */
+    public void startTimeout() {
+        this.timeoutMillis = getConfiguration().getAsInteger(Feature.timeOut);
+        this.parseStartTime = System.currentTimeMillis();
+        this.interrupted = false;
+    }
+
+    /**
+     * Check if parsing has exceeded the timeout.
+     * This method should be called periodically during parsing.
+     * 
+     * @return true if timeout has been exceeded
+     */
+    public boolean checkTimeout() {
+        if (timeoutMillis <= 0) {
+            return false;
+        }
+        
+        long elapsed = System.currentTimeMillis() - parseStartTime;
+        if (elapsed > timeoutMillis) {
+            interrupted = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Reset timeout state after parsing completes.
+     */
+    public void resetTimeout() {
+        this.parseStartTime = 0;
+        this.interrupted = false;
+    }
+
 }

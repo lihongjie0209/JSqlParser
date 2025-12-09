@@ -12,16 +12,9 @@ package net.sf.jsqlparser.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.parser.feature.Feature;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 
@@ -246,21 +239,18 @@ public final class CCJSqlParserUtil {
     public static Statement parseStatement(CCJSqlParser parser) throws JSQLParserException {
         Statement statement = null;
         try {
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            Future<Statement> future = executorService.submit(new Callable<Statement>() {
-                @Override
-                public Statement call() throws Exception {
-                    return parser.Statement();
-                }
-            });
-            executorService.shutdown();
-
-            statement = future.get( parser.getConfiguration().getAsInteger(Feature.timeOut), TimeUnit.MILLISECONDS);
-        } catch (TimeoutException ex) {
-            parser.interrupted = true;
-            throw new JSQLParserException("Time out occurred.", ex);
+            parser.startTimeout();
+            statement = parser.Statement();
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.");
+            }
         } catch (Exception ex) {
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.", ex);
+            }
             throw new JSQLParserException(ex);
+        } finally {
+            parser.resetTimeout();
         }
         return statement;
     }
@@ -310,21 +300,18 @@ public final class CCJSqlParserUtil {
     public static Statements parseStatements(CCJSqlParser parser) throws JSQLParserException {
         Statements statements = null;
         try {
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            Future<Statements> future = executorService.submit(new Callable<Statements>() {
-                @Override
-                public Statements call() throws Exception {
-                    return parser.Statements();
-                }
-            });
-            executorService.shutdown();
-
-            statements = future.get( parser.getConfiguration().getAsInteger(Feature.timeOut) , TimeUnit.MILLISECONDS);
-        } catch (TimeoutException ex) {
-            parser.interrupted = true;
-            throw new JSQLParserException("Time out occurred.", ex);
+            parser.startTimeout();
+            statements = parser.Statements();
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.");
+            }
         } catch (Exception ex) {
+            if (parser.interrupted) {
+                throw new JSQLParserException("Time out occurred.", ex);
+            }
             throw new JSQLParserException(ex);
+        } finally {
+            parser.resetTimeout();
         }
         return statements;
     }
