@@ -242,11 +242,11 @@ public final class CCJSqlParserUtil {
             parser.startTimeout();
             statement = parser.Statement();
             if (parser.interrupted) {
-                throw new JSQLParserException("Time out occurred.");
+                throw new JSQLParserException("Time out occurred.", new java.util.concurrent.TimeoutException());
             }
         } catch (Exception ex) {
             if (parser.interrupted) {
-                throw new JSQLParserException("Time out occurred.", ex);
+                throw new JSQLParserException("Time out occurred.", new java.util.concurrent.TimeoutException());
             }
             throw new JSQLParserException(ex);
         } finally {
@@ -303,11 +303,11 @@ public final class CCJSqlParserUtil {
             parser.startTimeout();
             statements = parser.Statements();
             if (parser.interrupted) {
-                throw new JSQLParserException("Time out occurred.");
+                throw new JSQLParserException("Time out occurred.", new java.util.concurrent.TimeoutException());
             }
         } catch (Exception ex) {
             if (parser.interrupted) {
-                throw new JSQLParserException("Time out occurred.", ex);
+                throw new JSQLParserException("Time out occurred.", new java.util.concurrent.TimeoutException());
             }
             throw new JSQLParserException(ex);
         } finally {
