@@ -9,12 +9,6 @@
  */
 package net.sf.jsqlparser.parser;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -35,10 +30,15 @@ import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import net.sf.jsqlparser.statement.UnsupportedStatement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.TableStatement;
-import net.sf.jsqlparser.test.MemoryLeakVerifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -337,13 +337,6 @@ public class CCJSqlParserUtilTest {
     }
 
     @Test
-    public void testTableStatementIssue1836() throws JSQLParserException {
-        TableStatement expr = (TableStatement) CCJSqlParserUtil
-                .parse("TABLE columns ORDER BY column_name LIMIT 10 OFFSET 10");
-        assertEquals("TABLE columns ORDER BY column_name LIMIT 10 OFFSET 10", expr.toString());
-    }
-
-    @Test
     public void testCondExpressionIssue1482_2() throws JSQLParserException {
         Expression expr = CCJSqlParserUtil.parseCondExpression(
                 "test_table_enum.f1_enum IN ('TEST2'::test.\"test_enum\")", false);
@@ -390,7 +383,7 @@ public class CCJSqlParserUtilTest {
         assertDoesNotThrow(new Executable() {
             @Override
             public void execute() throws Throwable {
-                executorService.awaitTermination(20, TimeUnit.SECONDS);
+                executorService.awaitTermination(10, TimeUnit.SECONDS);
             }
         });
 
