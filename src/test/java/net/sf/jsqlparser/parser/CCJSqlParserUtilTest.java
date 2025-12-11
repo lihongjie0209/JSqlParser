@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.sf.jsqlparser.statement.UnsupportedStatement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.test.MemoryLeakVerifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
