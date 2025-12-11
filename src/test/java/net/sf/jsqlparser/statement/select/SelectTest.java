@@ -42,7 +42,6 @@ import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.Statements;
 import static net.sf.jsqlparser.test.TestUtils.*;
 
-import net.sf.jsqlparser.test.MemoryLeakVerifier;
 import net.sf.jsqlparser.test.TestUtils;
 import org.apache.commons.io.IOUtils;
 import static org.assertj.core.api.Assertions.assertThat;
